@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,36 +8,61 @@
     <title>Simple Web Service Frontend</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Brush Script MT", "Lucida Handwriting", cursive;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #f9f9f9;
+            color: #7e1010;
         }
         .container {
             max-width: 600px;
             margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background: #70a4dd;
+            padding: 12px;
+            border: 4px solid #2d0312;
+            border-radius: 8px;
+            box-shadow: 0 5px 3px rgba(196, 210, 42, 0.1);
         }
-        input, button {
+        h1, h2 {
+            font-family: "Courier New", Courier, monospace;
+            color: #000000f9;
+        }
+        input[type="number"], input[type="text"], button {
             padding: 10px;
-            margin: 5px 0;
+            margin: 10px 0;
             width: 100%;
+            border: 1px solid #70c01bab;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            font-family: "Courier New", Courier, monospace;
+            background-color: #fdfdfd;
+        }
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: #ab5e1290;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(85, 85, 85, 0.2);
+            outline: none;
         }
         button {
             cursor: pointer;
-            background-color: #007BFF;
+            background-color: #16d28a;
             color: white;
-            border: none;
+            border: 3px solid #031b7c;
+            font-weight: bold;
+            font-family: "Brush Script MT", "Lucida Handwriting", cursive;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #042938;
+            border-color: #666;
         }
         .result {
             margin-top: 20px;
             padding: 10px;
-            background: #e9ecef;
+            background: #f7f7f7;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            color: #333;
+            font-family: "Courier New", Courier, monospace;
         }
     </style>
 </head>
@@ -65,16 +92,22 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:8080/value/${key}`, {
-                    method: 'GET'
-                });
+                const response = await fetch(`http://localhost:8080/list/${key}`);
                 if (!response.ok) {
-                    throw new Error('Value not found');
+                    if (response.status === 404) {
+                        throw new Error('Value not found');
+                    } else {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
                 }
                 const data = await response.json();
                 resultDiv.textContent = `Key: ${key}, Value: ${data.value}`;
+
+                // Log data to console
+                console.log('Fetched data:', data);
             } catch (error) {
                 resultDiv.textContent = error.message;
+                console.error('Fetch error:', error);
             }
         }
 
@@ -86,19 +119,36 @@
                 resultDiv.textContent = 'Please enter a value.';
                 return;
             }
-            
 
             try {
-                const response = await fetch(`http://localhost:8080/key/${value}`, {
+                const response = await fetch(`http://localhost:8080/list`, {
                     method: 'GET'
                 });
                 if (!response.ok) {
                     throw new Error('Key not found');
                 }
                 const data = await response.json();
-                resultDiv.textContent = `Value: ${value}, Key: ${data.key}`;
+                
+                // Find the key corresponding to the input value
+                let foundKey = null;
+                for (const key in data) {
+                    if (data[key] === value) {
+                        foundKey = key;
+                        break;
+                    }
+                }
+                
+                if (foundKey !== null) {
+                    resultDiv.textContent = `Value: ${value}, Key: ${foundKey}`;
+                } else {
+                    resultDiv.textContent = `Value: ${value} not found`;
+                }
+
+                // Log data to console
+                console.log('Fetched data:', data);
             } catch (error) {
                 resultDiv.textContent = error.message;
+                console.error('Fetch error:', error);
             }
         }
     </script>

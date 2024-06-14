@@ -8,13 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func main() {
 	members := map[int]string{1: "Aubrey", 2: "Nathan", 3: "Justin"}
 
 	r := gin.Default()
 
-	
 	r.Use(cors.Default())
 
 	r.StaticFile("/", "./index.html")
@@ -25,33 +23,27 @@ func main() {
 
 	//r.POST("/lists", func(c *gin.Context) {})
 
-	r.GET("/list/:id", func(c *gin.Context) {
-		idParam := c.Param("id")
+	r.GET("/list/:key", func(c *gin.Context) {
+		idParam := c.Param("key") // Use "key" instead of "id"
 
 		id, err := strconv.Atoi(idParam)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid parameter",
-		})
-		return
-		}
-
-		//Retrieving value
-		value,  exists := members[id]
-		if !exists {
-			c.JSON(http.StatusBadRequest, gin.H{"Error": "Id not found in the available list"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid parameter"})
 			return
 		}
 
-		//Respond with key value pair
-		c.JSON(http.StatusAccepted, gin.H{
-			 "Key": id, "value": value,
+		// Retrieving value
+		value, exists := members[id]
+		if !exists {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Key not found"})
+			return
+		}
+
+		// Respond with key value pair
+		c.JSON(http.StatusOK, gin.H{
+			"Key": id, "Value": value,
 		})
-	
 	})
-
-
-
 
 	r.Run()
 }
-
