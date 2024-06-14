@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Web Service Frontend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Web Service Frontend</h1>
+
+        <h2>Get Value by Key</h2>
+        <input type="number" id="keyInput" placeholder="Enter key (integer)">
+        <button onclick="getValue()">Get Value</button>
+        <div id="valueResult" class="result"></div>
+
+        <h2>Get Key by Value</h2>
+        <input type="text" id="valueInput" placeholder="Enter value (string)">
+        <button onclick="getKey()">Get Key</button>
+        <div id="keyResult" class="result"></div>
+    </div>
+
+    <script>
+        async function getValue() {
+            const key = document.getElementById('keyInput').value;
+            const resultDiv = document.getElementById('valueResult');
+
+            if (key === '') {
+                resultDiv.textContent = 'Please enter a key.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/value/${key}`, {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    throw new Error('Value not found');
+                }
+                const data = await response.json();
+                resultDiv.textContent = `Key: ${key}, Value: ${data.value}`;
+            } catch (error) {
+                resultDiv.textContent = error.message;
+            }
+        }
+
+        async function getKey() {
+            const value = document.getElementById('valueInput').value;
+            const resultDiv = document.getElementById('keyResult');
+
+            if (value === '') {
+                resultDiv.textContent = 'Please enter a value.';
+                return;
+            }
+            
+
+            try {
+                const response = await fetch(`http://localhost:8080/key/${value}`, {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    throw new Error('Key not found');
+                }
+                const data = await response.json();
+                resultDiv.textContent = `Value: ${value}, Key: ${data.key}`;
+            } catch (error) {
+                resultDiv.textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>
