@@ -32,6 +32,9 @@ func main() {
 			return
 		}
 
+		r.POST("/list" func(c *gin.Context) {
+			}
+
 		// Retrieving value
 		value, exists := members[id]
 		if !exists {
